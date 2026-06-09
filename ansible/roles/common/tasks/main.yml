@@ -1,0 +1,15 @@
+---
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+      - unzip
+      - htop
+      - jq
+    state: present

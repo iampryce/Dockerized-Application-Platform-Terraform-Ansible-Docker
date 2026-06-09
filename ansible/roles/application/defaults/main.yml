@@ -1,0 +1,5 @@
+---
+app_dir: /opt/app
+app_db_name: appdb
+app_db_user: appuser
+app_db_password: apppassword

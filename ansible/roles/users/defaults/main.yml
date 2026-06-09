@@ -1,0 +1,5 @@
+---
+devops_user: devops
+
+# Set via group_vars, host_vars, or --extra-vars at run time
+devops_public_key: ""

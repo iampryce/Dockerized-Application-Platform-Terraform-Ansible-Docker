@@ -1,0 +1,20 @@
+---
+- name: Create {{ devops_user }} user
+  ansible.builtin.user:
+    name: "{{ devops_user }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Add {{ devops_user }} to sudoers
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ devops_user }}"
+    content: "{{ devops_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: Configure authorized_keys for {{ devops_user }}
+  ansible.posix.authorized_key:
+    user: "{{ devops_user }}"
+    state: present
+    key: "{{ devops_public_key }}"
