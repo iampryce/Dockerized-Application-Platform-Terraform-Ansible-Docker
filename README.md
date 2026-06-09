@@ -58,8 +58,8 @@ Nginx → Flask → PostgreSQL Running
 * Route Table
 * Admin Security Group (SSH :22)
 * Application Security Group (HTTP :80, SSH from Admin)
-* EC2 Admin Server (t3.micro) — Ansible control node
-* EC2 Application Server (t3.small) — Docker host
+* EC2 Admin Server (t3.micro) , Ansible control node
+* EC2 Application Server (t3.small) , Docker host
 
 ---
 
@@ -75,11 +75,11 @@ Ansible automates everything that happens after the servers exist: Docker instal
 
 ### Container Orchestration with Docker Compose
 
-Docker Compose manages the multi-container application stack declaratively. Service dependencies are enforced at startup — Nginx waits for the backend, and the backend waits for PostgreSQL to pass its health check before accepting connections.
+Docker Compose manages the multi-container application stack declaratively. Service dependencies are enforced at startup , Nginx waits for the backend, and the backend waits for PostgreSQL to pass its health check before accepting connections.
 
 ### Nginx as Reverse Proxy
 
-Nginx is the only publicly exposed service, listening on port 80. All incoming traffic passes through Nginx before reaching Flask. Flask and PostgreSQL are accessible only within the Docker network — they are not reachable from the internet.
+Nginx is the only publicly exposed service, listening on port 80. All incoming traffic passes through Nginx before reaching Flask. Flask and PostgreSQL are accessible only within the Docker network , they are not reachable from the internet.
 
 ### Persistent Database Storage
 
@@ -94,7 +94,7 @@ Roles are kept single-purpose: `docker` installs and configures the Docker Engin
 ## Implementation Highlights
 
 * Provisioned AWS infrastructure through reusable Terraform modules
-* Configured security groups to expose only port 80 — Flask and PostgreSQL are internal only
+* Configured security groups to expose only port 80 , Flask and PostgreSQL are internal only
 * Automated Docker Engine installation using the official Docker apt repository
 * Deployed application files and configuration using Ansible copy and template tasks
 * Used a Jinja2 template for Docker Compose to support environment-specific credentials
@@ -124,7 +124,7 @@ terraform plan
 terraform apply
 ```
 ![alt text](screenshots/Terraform-resources-created.png)
-
+![alt text](<screenshots/instances created.png>)
 
 ### Phase 2: Docker Installation
 
