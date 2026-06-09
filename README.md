@@ -1,23 +1,32 @@
-
 # Dockerized Application Platform (Terraform, Ansible & Docker)
 
-![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white) ![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white) ![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge\&logo=terraform\&logoColor=white)
+![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge\&logo=ansible\&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge\&logo=amazonaws\&logoColor=white)
+![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge\&logo=amazonec2\&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge\&logo=nginx\&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge\&logo=flask\&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge\&logo=postgresql\&logoColor=white)
 
 ---
 
-## Project Overview
+# Project Overview
 
-The Dockerized Application Platform automates the provisioning and configuration of containerized application infrastructure on AWS. Using Terraform for infrastructure provisioning and Ansible for configuration management, the platform deploys a multi-container application stack comprising Nginx, Flask, and PostgreSQL through Docker and Docker Compose.
+The Dockerized Application Platform automates the provisioning and configuration of containerized infrastructure on AWS. Using Terraform for infrastructure provisioning and Ansible for configuration management, the platform deploys a multi-container application stack consisting of Nginx, Flask, and PostgreSQL using Docker and Docker Compose.
+
+The project demonstrates how Infrastructure as Code, Configuration Management, and Containerisation can be combined to create a repeatable and automated deployment workflow.
 
 ---
 
-## Architecture
+# Architecture
 
 ![Architecture Diagram](Containarized-docker-app.png)
 
 ---
 
-## Deployment Workflow
+# Deployment Workflow
 
 ```text
 Developer
@@ -37,232 +46,283 @@ Docker Compose Up
 Nginx → Flask → PostgreSQL Running
 ```
 
----
-
-## Objectives
-
-* Provision AWS infrastructure using Terraform modules
-* Automate Docker Engine installation using Ansible
-* Deploy a multi-container application stack using Docker Compose
-* Implement container networking between services
-* Persist database data using Docker named volumes
-* Validate the full application stack end-to-end
-
----
-
-## Infrastructure Overview
+# Infrastructure Overview
 
 * VPC
 * Public Subnet
 * Internet Gateway
 * Route Table
 * Admin Security Group (SSH :22)
-* Application Security Group (HTTP :80, SSH from Admin)
-* EC2 Admin Server (t3.micro) , Ansible control node
-* EC2 Application Server (t3.small) , Docker host
+* Application Security Group (HTTP :80, SSH from Admin Server)
+* EC2 Admin Server (t3.micro) — Ansible Control Node
+* EC2 Application Server (t3.small) — Docker Host
 
 ---
 
-## Engineering Decisions
+# Service Exposure Model
 
-### Infrastructure Provisioning with Terraform
+| Service    | Port | Access                  |
+| ---------- | ---- | ----------------------- |
+| SSH        | 22   | Admin Server Only       |
+| Nginx      | 80   | Internet                |
+| Flask      | 5000 | Internal Docker Network |
+| PostgreSQL | 5432 | Internal Docker Network |
 
-Terraform provisions all AWS resources through declarative configuration files, enabling version-controlled and repeatable deployments. Infrastructure is organized into reusable modules for networking and compute, keeping each concern isolated and independently maintainable.
-
-### Configuration Management with Ansible
-
-Ansible automates everything that happens after the servers exist: Docker installation, application file deployment, and container lifecycle management. Separating infrastructure provisioning from server configuration keeps each tool in its area of responsibility.
-
-### Container Orchestration with Docker Compose
-
-Docker Compose manages the multi-container application stack declaratively. Service dependencies are enforced at startup , Nginx waits for the backend, and the backend waits for PostgreSQL to pass its health check before accepting connections.
-
-### Nginx as Reverse Proxy
-
-Nginx is the only publicly exposed service, listening on port 80. All incoming traffic passes through Nginx before reaching Flask. Flask and PostgreSQL are accessible only within the Docker network , they are not reachable from the internet.
-
-### Persistent Database Storage
-
-PostgreSQL data is stored in a named Docker volume. Container restarts and re-deployments do not affect stored data.
-
-### Ansible Role Separation
-
-Roles are kept single-purpose: `docker` installs and configures the Docker Engine, `application` handles application deployment. This makes each role independently testable and reusable.
+Only Nginx is publicly accessible. Flask and PostgreSQL communicate exclusively through the Docker network and are not exposed directly to the internet.
 
 ---
 
-## Implementation Highlights
+# Engineering Decisions
 
-* Provisioned AWS infrastructure through reusable Terraform modules
-* Configured security groups to expose only port 80 , Flask and PostgreSQL are internal only
-* Automated Docker Engine installation using the official Docker apt repository
-* Deployed application files and configuration using Ansible copy and template tasks
-* Used a Jinja2 template for Docker Compose to support environment-specific credentials
-* Implemented service dependency ordering with Docker Compose health checks
-* Configured Nginx as a reverse proxy , sole entry point for all application traffic
-* Persisted PostgreSQL data through a named Docker volume
+## Infrastructure Provisioning with Terraform
+
+Terraform provisions AWS infrastructure through declarative configuration files, enabling version-controlled and repeatable deployments. Infrastructure components are organised into reusable modules to improve maintainability and scalability.
+
+## Configuration Management with Ansible
+
+Ansible automates all post-provisioning server configuration tasks including Docker installation, application deployment, and operating system configuration. This separation ensures clear responsibility boundaries between infrastructure provisioning and server configuration.
+
+## Container Orchestration with Docker Compose
+
+Docker Compose manages the multi-container application stack declaratively. Service dependencies ensure PostgreSQL becomes available before Flask starts, and Flask becomes available before Nginx begins serving requests.
+
+## Nginx as Reverse Proxy
+
+Nginx serves as the single public entry point to the application. All inbound traffic is routed through Nginx before reaching the Flask backend. This prevents direct access to internal application components.
+
+## Persistent Database Storage
+
+PostgreSQL data is stored in a named Docker volume, ensuring application data survives container restarts and re-deployments.
+
+## Ansible Role Separation
+
+Ansible roles follow a single-responsibility design:
+
+* common
+* users
+* security
+* docker
+* application
+
+This improves maintainability and promotes role reuse across future projects.
 
 ---
 
-## Project Execution
 
-### Phase 1: Infrastructure Provisioning
+# Project Execution
 
-Provisioned the AWS network and compute layer using Terraform.
+## Phase 1: Infrastructure Provisioning
 
-**Activities**
+Provisioned the AWS networking and compute layer using Terraform.
+
+### Activities
 
 * Terraform initialization
-* VPC and subnet deployment
-* Security group configuration (port 80, SSH)
-* Admin and application server provisioning
+* VPC deployment
+* Public subnet deployment
+* Route table configuration
+* Security group configuration
+* EC2 instance deployment
 
-**Validation**
+### Validation
 
 ```bash
 terraform plan
+```
+
+```bash
 terraform apply
 ```
 ![alt text](screenshots/Terraform-resources-created.png)
+
+Infrastructure provisioned successfully.
+
 ![alt text](<screenshots/instances created.png>)
 
-### Phase 2: Docker Installation
+---
 
-Installed Docker Engine on the application server using Ansible.
+## Phase 2: Docker Installation
 
-**Activities**
+Installed and configured Docker Engine using Ansible.
 
-* Added Docker apt repository
-* Installed docker-ce, docker-ce-cli, containerd.io, docker-compose-plugin
-* Started and enabled Docker service
-* Added ubuntu user to docker group
+### Activities
 
-**Validation**
+* Added Docker repository
+* Installed Docker Engine
+* Installed Docker Compose Plugin
+* Started Docker service
+* Enabled Docker service
+* Added application user to docker group
+
+### Validation
+
+Verify Ansible connectivity.
 
 ```bash
 ansible all -m ping
+```
+
+![alt text](screenshots/step-6-asible-conectivity-test.png)
+
+Execute the platform playbook.
+
+```bash
 ansible-playbook playbooks/site.yml
 ```
 
+![alt text](screenshots/step-7-ansible-play-book.png)
+
+
+Verify Docker installation.
+
 ```bash
 docker --version
+docker compose version
 systemctl status docker
 ```
 
+![alt text](screenshots/step-8-SSH-from-admin-to-app-server.png)
+
+![alt text](screenshots/step-9-docker-intalled-and-running.png)
+
 ---
 
-### Phase 3: Container Deployment.
+## Phase 3: Container Deployment
 
 Deployed the application stack using Docker Compose.
 
-**Activities**
+### Activities
 
-* Copied application source files to the server
-* Templated docker-compose.yml with environment credentials
-* Built backend container image
-* Started Nginx, Flask, and PostgreSQL containers
+* Copied application source files
+* Generated Docker Compose configuration
+* Built Flask application image
+* Started Nginx container
+* Started Flask container
+* Started PostgreSQL container
 
-**Validation**
+### Validation
 
 ```bash
-docker compose ps
+docker compose -f /opt/app/docker-compose.yml ps
+
+```
+```bash
 docker ps
 ```
+![alt text](screenshots/step-10-verify-container1.png)
 
----
 
-### Phase 4: Application Validation
+## Phase 4: Application Validation
 
-Validated end-to-end connectivity through the full stack.
+Validated end-to-end connectivity through the application stack.
 
-**Nginx Response**
+### Validation
+
+Verify Nginx response.
 
 ```bash
 curl http://localhost
 ```
+![alt text](screenshots/verify-nginx-response.png)
 
-**Flask API Response (via Nginx)**
+Verify Flask health endpoint.
 
 ```bash
 curl http://localhost/health
+```
+![alt text](screenshots/verify-nginx-health.png)
+
+Verify API status endpoint.
+
+```bash
 curl http://localhost/api/status
 ```
 
-**PostgreSQL Validation**
+
+Verify PostgreSQL connectivity.
 
 ```bash
 docker exec -it <db-container> psql -U appuser -d appdb -c "\l"
 ```
+![alt text](screenshots/verify-PostgreSQL.png)
 
----
 
-### Phase 5: Security and Operations
+## Phase 5: Security and Operations
 
-Validated service persistence and container health.
+Validated platform security and operational readiness.
 
-**Docker Service Persistence**
+### Docker Service Persistence
 
 ```bash
 systemctl status docker
 systemctl is-enabled docker
 ```
 
-**Container Health Validation**
+
+### Container Health Validation
 
 ```bash
 docker compose ps
+```
+
+```bash
 docker inspect <container-name> --format='{{.State.Health.Status}}'
 ```
 
-**SSH Hardening Validation**
+![alt text](screenshots/verify-contianer-health.png)
+
+### SSH Hardening Validation
 
 ```bash
 sudo grep PermitRootLogin /etc/ssh/sshd_config
 sudo grep PasswordAuthentication /etc/ssh/sshd_config
 ```
+![
+    
+](screenshots/verify-security-hardeding.png)
 
----
+## Phase 6: External Access Validation
 
-## Validation Summary
+Validated application accessibility through the public endpoint.
 
-✔ Infrastructure deployed successfully
+```bash
+curl http://<application-public-ip>
+```
 
-✔ Docker Engine installed and running
+or access through a web browser.
 
-✔ Application containers started
+ http://<application-public-ip>
 
-✔ Nginx proxying traffic to Flask backend
 
-✔ Flask API responding through Nginx on port 80
+* Successful application response through the public IP
 
-✔ PostgreSQL accepting connections
+![alt text](screenshots/verified-app.png)
 
-✔ Named volume persisting database data
 
-✔ SSH hardening applied
-
----
-
-## Key Concepts Demonstrated
+# Key Concepts Demonstrated
 
 * Infrastructure as Code (IaC)
 * Configuration Management
 * Containerisation
-* Multi-container Application Deployment
+* Multi-Container Application Deployment
+* Docker Compose
 * Container Networking
 * Reverse Proxy Configuration
 * Persistent Storage with Docker Volumes
 * Service Health Checks
 * Ansible Templating with Jinja2
+* Linux Administration
+* Security Hardening
 * Modular Infrastructure Design
 * Separation of Infrastructure and Configuration
 
 ---
 
 
-## Author
 
-### Oluwatobi Ogundimu
+# Author
+
+## Oluwatobi Ogundimu
 
 GitHub: https://github.com/iampryce
 
