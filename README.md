@@ -99,7 +99,7 @@ Roles are kept single-purpose: `docker` installs and configures the Docker Engin
 * Deployed application files and configuration using Ansible copy and template tasks
 * Used a Jinja2 template for Docker Compose to support environment-specific credentials
 * Implemented service dependency ordering with Docker Compose health checks
-* Configured Nginx as a reverse proxy — sole entry point for all application traffic
+* Configured Nginx as a reverse proxy , sole entry point for all application traffic
 * Persisted PostgreSQL data through a named Docker volume
 
 ---
@@ -123,7 +123,7 @@ Provisioned the AWS network and compute layer using Terraform.
 terraform plan
 terraform apply
 ```
-
+![alt text](screenshots/Terraform-resources-created.png)
 
 
 ### Phase 2: Docker Installation
@@ -259,15 +259,6 @@ sudo grep PasswordAuthentication /etc/ssh/sshd_config
 
 ---
 
-## Future Enhancements
-
-* CI/CD pipeline with GitHub Actions — automate image builds and deployments on code push
-* Container image registry with Amazon ECR — store versioned images instead of building on the server
-* SSL/TLS termination at Nginx — HTTPS with Let's Encrypt or ACM certificates
-* Kubernetes migration — move from Docker Compose to EKS for scalability and self-healing
-* Environment separation — staging and production configurations with separate Terraform workspaces
-
----
 
 ## Author
 
