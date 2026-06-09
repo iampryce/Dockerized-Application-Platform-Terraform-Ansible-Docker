@@ -141,7 +141,7 @@ Infrastructure provisioned successfully.
 
 ---
 
-## Phase 2: Docker Installation
+## Phase 2: Server Configuration & Docker Installation
 
 Installed and configured Docker Engine using Ansible.
 
