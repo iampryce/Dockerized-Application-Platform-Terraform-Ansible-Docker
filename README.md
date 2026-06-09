@@ -151,7 +151,7 @@ systemctl status docker
 
 ---
 
-### Phase 3: Container Deployment
+### Phase 3: Container Deployment.
 
 Deployed the application stack using Docker Compose.
 
